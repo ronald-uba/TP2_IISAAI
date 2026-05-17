@@ -1,4 +1,5 @@
 **PROMPT v.1**
+
 Necesito un openapi.yaml (3.1) para una API de libros con Genres y Books.
 
 recursos:
@@ -41,6 +42,7 @@ endpoints:
 abrilo en canvas para que podamos editarlo juntos
 
 **Prompt v2. agregando un endpoint de PUT en books/{bookid}**
+
 agregale a yaml este endpoint sin modificar el resto de los endpoints creados antes:
 
 PUT    /genres/{id}/book/{bookId}
