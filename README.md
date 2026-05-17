@@ -2,6 +2,7 @@
 Trabajo práctico 2 IISAIA
 
 Incluyo en *openapi_libros.yaml* el repo el yaml de openapi_libros con los endpoints "GET/genres/{id}/books", "POST/genres/{id}/books" y DELETE /genres/{id}/book/{bookId}.  
+
 En *openapi_libros_v2.yaml* incluyo el yaml anterior con el agregado del endpoint "PUT/genres/{id}/book/{bookId}".  
 
 Debajo prints de las pruebas en swagger.io.  
