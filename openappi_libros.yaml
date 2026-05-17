@@ -1,0 +1,345 @@
+openapi: 3.1.0
+info:
+  title: API de Libros
+  version: 1.0.0
+  description: API para gestionar géneros y libros.
+
+servers:
+  - url: http://localhost:3000
+    description: Servidor local
+
+tags:
+  - name: Genres
+    description: Operaciones sobre géneros
+  - name: Books
+    description: Operaciones sobre libros
+
+paths:
+  /genres:
+    get:
+      tags:
+        - Genres
+      summary: Listar géneros
+      operationId: listGenres
+      responses:
+        '200':
+          description: Lista de géneros
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Genre'
+              examples:
+                success:
+                  value:
+                    - id: 1
+                      title: Ciencia ficción
+                    - id: 2
+                      title: Novela histórica
+
+    post:
+      tags:
+        - Genres
+      summary: Crear un género
+      operationId: createGenre
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenreInput'
+            examples:
+              createGenre:
+                value:
+                  title: Ciencia ficción
+      responses:
+        '201':
+          description: Género creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Genre'
+              examples:
+                created:
+                  value:
+                    id: 1
+                    title: Ciencia ficción
+        '400':
+          description: Datos inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missingTitle:
+                  value:
+                    error: title es requerido
+
+  /genres/{id}/books:
+    get:
+      tags:
+        - Books
+      summary: Listar libros de un género
+      operationId: listBooksByGenre
+      parameters:
+        - $ref: '#/components/parameters/GenreId'
+        - name: page
+          in: query
+          required: false
+          description: Número de página.
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          example: 1
+        - name: limit
+          in: query
+          required: false
+          description: Cantidad máxima de resultados por página.
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+          example: 10
+      responses:
+        '200':
+          description: Lista de libros del género solicitado
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Book'
+              examples:
+                success:
+                  value:
+                    - id: 1
+                      title: Dune
+                      language: es
+                      rank: 1
+                      genre_id: 1
+                    - id: 2
+                      title: Fundación
+                      language: es
+                      rank: null
+                      genre_id: 1
+        '400':
+          description: Datos inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidData:
+                  value:
+                    error: title y language son requeridos
+        '404':
+          description: Genre no existe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                genreNotFound:
+                  value:
+                    error: no se encontró el género 1
+
+    post:
+      tags:
+        - Books
+      summary: Crear un libro dentro de un género
+      operationId: createBookByGenre
+      parameters:
+        - $ref: '#/components/parameters/GenreId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookInput'
+            examples:
+              createBook:
+                value:
+                  title: Dune
+                  language: es
+                  rank: 1
+      responses:
+        '201':
+          description: Libro creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+              examples:
+                created:
+                  value:
+                    id: 1
+                    title: Dune
+                    language: es
+                    rank: 1
+                    genre_id: 1
+        '400':
+          description: Datos inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidData:
+                  value:
+                    error: title y language son requeridos
+        '404':
+          description: Genre no existe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                genreNotFound:
+                  value:
+                    error: no se encontró el género 1
+
+  /genres/{id}/book/{bookId}:
+    delete:
+      tags:
+        - Books
+      summary: Eliminar un libro de un género
+      operationId: deleteBookByGenre
+      parameters:
+        - $ref: '#/components/parameters/GenreId'
+        - name: bookId
+          in: path
+          required: true
+          description: ID del libro.
+          schema:
+            type: integer
+          example: 10
+      responses:
+        '204':
+          description: Libro borrado exitosamente. Sin contenido en la respuesta.
+        '404':
+          description: Recurso no existe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                notFound:
+                  value:
+                    error: no se encontró el género 1 o el libro 10
+
+components:
+  parameters:
+    GenreId:
+      name: id
+      in: path
+      required: true
+      description: ID del género.
+      schema:
+        type: integer
+      example: 1
+
+  schemas:
+    Genre:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - title
+      properties:
+        id:
+          type: integer
+          examples:
+            - 1
+        title:
+          type: string
+          examples:
+            - Ciencia ficción
+
+    GenreInput:
+      type: object
+      additionalProperties: false
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          minLength: 1
+          examples:
+            - Ciencia ficción
+
+    Book:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - title
+        - language
+        - rank
+        - genre_id
+      properties:
+        id:
+          type: integer
+          examples:
+            - 1
+        title:
+          type: string
+          examples:
+            - Dune
+        language:
+          type: string
+          examples:
+            - es
+        rank:
+          type:
+            - integer
+            - 'null'
+          minimum: 1
+          maximum: 3
+          examples:
+            - 1
+            - null
+        genre_id:
+          type: integer
+          examples:
+            - 1
+
+    BookInput:
+      type: object
+      additionalProperties: false
+      required:
+        - title
+        - language
+      properties:
+        title:
+          type: string
+          minLength: 1
+          examples:
+            - Dune
+        language:
+          type: string
+          minLength: 1
+          examples:
+            - es
+        rank:
+          type:
+            - integer
+            - 'null'
+          minimum: 1
+          maximum: 3
+          default: null
+          examples:
+            - 1
+            - null
+
+    ErrorResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          examples:
+            - title y language son requeridos
