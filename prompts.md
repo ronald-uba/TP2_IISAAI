@@ -54,5 +54,5 @@ agregale a yaml este endpoint sin modificar el resto de los endpoints creados an
                ---{ id: int, title: string, language: string, rank: int|null, genre_id: int }  
           --salida 400 (datos inválidos):  
                 ---{ error: "title y language son requeridos" }  
-             salida 404 (recurso no existe):  
-                     { error: "no se encontró el género {id} o el libro {bookId}" }  
+           --salida 404 (recurso no existe):  
+                  ---{ error: "no se encontró el género {id} o el libro {bookId}" }  
